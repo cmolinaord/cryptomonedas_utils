@@ -1,6 +1,12 @@
+#!/usr/bin/python
+
 import sys
 import requests
-from utils import eng as eng
+from engineering_notation import EngUnit as EngUnit
+
+def eng(str_units):
+	return str(EngUnit(str_units))
+
 
 args = sys.argv
 
