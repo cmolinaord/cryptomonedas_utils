@@ -20,18 +20,18 @@ url_api = 'https://api.coinmarketcap.com/v1/ticker/'
 url 	= url_api + coin
 r = requests.get(url).json()[0]
 symbol = r.get('symbol')
-price_usd = r.get('price_usd')+' USD'
+price_usd = r.get('price_usd')
 price_btc = r.get('price_btc')+'BTC'
 
 if len(args) == 2:
-	print("1 ", symbol, " = ", eng(price_usd), sep='')
+	print(symbol, "/BTC = ", eng(price_usd), sep='')
 
 elif len(args) == 3:
 	time_change = args[2]
 	times = ['1h', '24h', '7d']
 	if time_change in times:
 		change = r.get('percent_change_' + args[2])
-		print("1 ", symbol, " = ", eng(price_usd), " (", time_change, ": ", change, "%)", sep='')
+		print(symbol, "/BTC = ", eng(price_usd), " (", time_change, ": ", change, "%)", sep='')
 	else:
 		print('ERROR: argumento de tiempo invalido. Use (1h, 24h, 7d)')
 		exit()
