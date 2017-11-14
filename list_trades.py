@@ -7,8 +7,13 @@
 import sys
 import time
 import datetime
+import requests
+import numpy as np
 
 args = sys.argv
+amount = args[1]
+currency = args[2]
+date0 = args[3]
 
 if len(args) <= 2:
 	print('ERROR: Dame <cantidad> <moneda> <fecha> ')
@@ -18,15 +23,39 @@ print("hoy es: ")
 print(time.time())
 print(datetime.datetime.now())
 
-t0 = datetime.datetime.strptime(args[3],"%Y-%m-%d-%H:%M")
+t0 = datetime.datetime.strptime(date0,"%Y-%m-%d-%H:%M")
 t1 = datetime.datetime.now()
 
 print("Desde la fecha dada han pasado:")
 print(t1 - t0)
 
-url_init="https://min-api.cryptocompare.com/data/pricehistorical"
-url_request = url_init + "?" + "fsym=" + args[2] + "&tsyms=" + "USD,LTC,ETH" + "&ts=" + str(int(t0.timestamp()))
-print(url_request)
 
-# esto funciona, te da la url donde aparece el precio de la moneda introducida en la fecha dada
-# en cada una de las monedas destino.
+# Obtener lista de monedas
+with open("config/list_currencies.list") as f:
+	currencies = f.readlines()
+currencies = [x.strip() for x in currencies]
+N = len(currencies)
+N = 7
+
+curr_text = ""
+for i in range(N):
+	curr_text = curr_text + currencies[i] + ","
+curr_text = curr_text[:-1]
+
+
+url_init="https://min-api.cryptocompare.com/data/pricehistorical"
+url_request = url_init + "?" + "fsym=" + currency + "&tsyms=" + curr_text + "&ts=" + str(int(t0.timestamp()))
+print(url_request)
+#https://min-api.cryptocompare.com/data/pricehistorical?fsym=BTC&tsyms=USD,BTC,LTC,ETH,ETC,ZEC&ts=1510599600
+prices_0 = np.asarray(list(requests.get(url_request).json().get(currency).values()))
+
+url_request = url_init + "?" + "fsym=" + currency + "&tsyms=" + curr_text + "&ts=" + str(int(t1.timestamp()))
+prices_1 = np.asarray(list(requests.get(url_request).json().get(currency).values()))
+
+price_change = (prices_1 - prices_0)/prices_0 * 100.0
+
+print("monedas")
+print(currencies[0:N-1])
+print(prices_0)
+print(prices_1)
+print(price_change)
