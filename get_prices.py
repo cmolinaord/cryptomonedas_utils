@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import subprocess
 import sys
 import requests
 from engineering_notation import EngUnit as EngUnit
@@ -16,8 +17,21 @@ if len(args) <= 1:
 
 coin = args[1]
 
-url_api = 'https://api.coinmarketcap.com/v1/ticker/'
-url 	= url_api + coin
+url_api = 'api.coinmarketcap.com'
+
+proc = subprocess.Popen(["ping", "-W", "2", "-c", "1", "8.8.8.8"],stdout=subprocess.PIPE)
+stdout, stderr = proc.communicate()
+if proc.returncode != 0:
+	print("   No internet conexion  ")
+	exit()
+
+proc = subprocess.Popen(["ping", "-W", "2", "-c", "1", url_api],stdout=subprocess.PIPE)
+stdout, stderr = proc.communicate()
+if proc.returncode != 0:
+	print("Can't connect to " + url_api)
+	exit()
+
+url 	= 'https://' + url_api + '/v1/ticker/' + coin
 r = requests.get(url).json()[0]
 symbol = r.get('symbol')
 price_usd = r.get('price_usd')
